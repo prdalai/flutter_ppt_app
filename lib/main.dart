@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'dart:math';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   runApp(const MyApp());
@@ -52,20 +53,22 @@ class AppTheme {
       seedColor: const Color(0xFF00BFA5), // Teal accent
       brightness: Brightness.dark,
       background: const Color(0xFF212121), // Dark grey BG
-      surface: const Color(0xFF303030),    // Lighter dark grey for cards/surfaces
-      primary: const Color(0xFFE0E0E0),   // Main text color
+      surface: const Color(0xFF303030), // Lighter dark grey for cards/surfaces
+      primary: const Color(0xFFE0E0E0), // Main text color
       onPrimary: Colors.black,
       secondary: const Color(0xFF00BFA5), // Accent
-      onSecondary: Colors.black,          // Text on accent
+      onSecondary: Colors.black, // Text on accent
     ),
     useMaterial3: true,
     scaffoldBackgroundColor: const Color(0xFF212121),
-    textTheme: GoogleFonts.latoTextTheme(ThemeData.dark().textTheme.copyWith(
-          headlineMedium: GoogleFonts.inter(
-            fontWeight: FontWeight.w900,
-            color: Colors.white,
-          ),
-        )).apply(
+    textTheme: GoogleFonts.latoTextTheme(
+      ThemeData.dark().textTheme.copyWith(
+        headlineMedium: GoogleFonts.inter(
+          fontWeight: FontWeight.w900,
+          color: Colors.white,
+        ),
+      ),
+    ).apply(
       bodyColor: const Color(0xFFE0E0E0),
       displayColor: const Color(0xFFE0E0E0),
     ),
@@ -84,15 +87,14 @@ class AppTheme {
     ),
     useMaterial3: true,
     scaffoldBackgroundColor: Colors.white,
-    textTheme: GoogleFonts.latoTextTheme(ThemeData.light().textTheme.copyWith(
-          headlineMedium: GoogleFonts.inter(
-            fontWeight: FontWeight.w900,
-            color: Colors.white,
-          ),
-        )).apply(
-      bodyColor: Colors.black,
-      displayColor: Colors.black,
-    ),
+    textTheme: GoogleFonts.latoTextTheme(
+      ThemeData.light().textTheme.copyWith(
+        headlineMedium: GoogleFonts.inter(
+          fontWeight: FontWeight.w900,
+          color: Colors.white,
+        ),
+      ),
+    ).apply(bodyColor: Colors.black, displayColor: Colors.black),
   );
 }
 
@@ -207,7 +209,8 @@ class _PresentationScreenState extends State<PresentationScreen>
                       value: (currentSlide + 1) / slides.length,
                       backgroundColor: Colors.grey.shade300,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).colorScheme.secondary),
+                        Theme.of(context).colorScheme.secondary,
+                      ),
                       minHeight: 3,
                     ),
                     Expanded(
@@ -221,9 +224,7 @@ class _PresentationScreenState extends State<PresentationScreen>
                             return AnimatedSlidePage(
                               index: index,
                               controller: _pageController,
-                              child: SlideLayout(
-                                slide: slides[index],
-                              ),
+                              child: SlideLayout(slide: slides[index]),
                             );
                           },
                         ),
@@ -232,50 +233,55 @@ class _PresentationScreenState extends State<PresentationScreen>
                     // Footer Navigation
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 24.0, vertical: 12.0),
+                        horizontal: 24.0,
+                        vertical: 12.0,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             slides[currentSlide]['title'],
                             style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.color
-                                    ?.withOpacity(0.7),
-                                fontSize: 14),
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.color?.withOpacity(0.7),
+                              fontSize: 14,
+                            ),
                           ),
                           Row(
                             children: [
                               FilledButton.tonal(
                                 onPressed: _toggleHighlighting,
                                 style: FilledButton.styleFrom(
-                                  backgroundColor: _isHighlightingEnabled
-                                      ? Theme.of(context)
-                                          .colorScheme
-                                          .secondary
-                                          .withOpacity(0.3)
-                                      : null,
+                                  backgroundColor:
+                                      _isHighlightingEnabled
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .secondary
+                                              .withOpacity(0.3)
+                                          : null,
                                 ),
                                 child: const Icon(Icons.brush),
                               ),
                               const SizedBox(width: 8),
                               FilledButton.tonal(
-                                  onPressed: () => appThemeNotifier.toggleTheme(),
-                                  child: Icon(
-                                      appThemeNotifier.themeMode == ThemeMode.dark
-                                          ? Icons.light_mode_outlined
-                                          : Icons.dark_mode_outlined),
+                                onPressed: () => appThemeNotifier.toggleTheme(),
+                                child: Icon(
+                                  appThemeNotifier.themeMode == ThemeMode.dark
+                                      ? Icons.light_mode_outlined
+                                      : Icons.dark_mode_outlined,
+                                ),
                               ),
                               const SizedBox(width: 16),
                               FilledButton.tonal(
-                                  onPressed: _decreaseFontSize,
-                                  child: const Icon(Icons.text_decrease)),
+                                onPressed: _decreaseFontSize,
+                                child: const Icon(Icons.text_decrease),
+                              ),
                               const SizedBox(width: 8),
                               FilledButton.tonal(
-                                  onPressed: _increaseFontSize,
-                                  child: const Icon(Icons.text_increase)),
+                                onPressed: _increaseFontSize,
+                                child: const Icon(Icons.text_increase),
+                              ),
                               const SizedBox(width: 24),
                               FilledButton.tonal(
                                 onPressed:
@@ -283,27 +289,29 @@ class _PresentationScreenState extends State<PresentationScreen>
                                 child: const Icon(Icons.arrow_back),
                               ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                ),
                                 child: Text(
                                   '${currentSlide + 1} / ${slides.length}',
                                   style: TextStyle(
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.color,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).textTheme.bodyLarge?.color,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                               FilledButton.tonal(
-                                onPressed: currentSlide < slides.length - 1
-                                    ? nextSlide
-                                    : null,
+                                onPressed:
+                                    currentSlide < slides.length - 1
+                                        ? nextSlide
+                                        : null,
                                 child: const Icon(Icons.arrow_forward),
                               ),
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -321,9 +329,11 @@ class _PresentationScreenState extends State<PresentationScreen>
 class HighlightingOverlay extends StatefulWidget {
   final Widget child;
   final bool isEnabled;
-  const HighlightingOverlay(
-      {Key? key, required this.child, required this.isEnabled})
-      : super(key: key);
+  const HighlightingOverlay({
+    Key? key,
+    required this.child,
+    required this.isEnabled,
+  }) : super(key: key);
 
   @override
   State<HighlightingOverlay> createState() => _HighlightingOverlayState();
@@ -426,18 +436,15 @@ class _HighlightingOverlayState extends State<HighlightingOverlay> {
           fit: StackFit.expand,
           children: [
             widget.child,
-            ..._strokes.map((stroke) => StrokeItem(
-                  key: stroke.key,
-                  stroke: stroke,
-                )),
+            ..._strokes.map(
+              (stroke) => StrokeItem(key: stroke.key, stroke: stroke),
+            ),
             if (_pointerPosition != null && widget.isEnabled)
               Positioned(
                 left: _pointerPosition!.dx,
                 top: _pointerPosition!.dy,
                 child: IgnorePointer(
-                  child: HighlighterCursor(
-                    isDrawing: _isDrawing,
-                  ),
+                  child: HighlighterCursor(isDrawing: _isDrawing),
                 ),
               ),
           ],
@@ -487,16 +494,17 @@ class HighlightPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (stroke.points.length < 2) return;
 
-    final paint = Paint()
-      ..color = stroke.color
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..strokeWidth = stroke.strokeWidth
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = stroke.color
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..strokeWidth = stroke.strokeWidth
+          ..style = PaintingStyle.stroke;
 
     final path = Path();
     path.moveTo(stroke.points.first.dx, stroke.points.first.dy);
-    
+
     for (int i = 1; i < stroke.points.length; i++) {
       if (i == 1) {
         path.lineTo(stroke.points[i].dx, stroke.points[i].dy);
@@ -504,10 +512,10 @@ class HighlightPainter extends CustomPainter {
         final p0 = stroke.points[i - 2];
         final p1 = stroke.points[i - 1];
         final p2 = stroke.points[i];
-        
+
         final xc = (p0.dx + p1.dx) / 2;
         final yc = (p0.dy + p1.dy) / 2;
-        
+
         path.quadraticBezierTo(p1.dx, p1.dy, xc, yc);
       }
     }
@@ -524,10 +532,7 @@ class HighlightPainter extends CustomPainter {
 class HighlighterCursor extends StatelessWidget {
   final bool isDrawing;
 
-  const HighlighterCursor({
-    Key? key,
-    this.isDrawing = false,
-  }) : super(key: key);
+  const HighlighterCursor({Key? key, this.isDrawing = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -539,10 +544,7 @@ class HighlighterCursor extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: const Color(0xFFF3B943).withOpacity(isDrawing ? 0.6 : 0.3),
-          border: Border.all(
-            color: const Color(0xFFF3B943),
-            width: 2,
-          ),
+          border: Border.all(color: const Color(0xFFF3B943), width: 2),
         ),
       ),
     );
@@ -571,9 +573,10 @@ class GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final paint = Paint()
-      ..color = isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300
-      ..strokeWidth = 0.5;
+    final paint =
+        Paint()
+          ..color = isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300
+          ..strokeWidth = 0.5;
 
     for (double i = 0; i < size.height; i += 20) {
       canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
@@ -593,16 +596,14 @@ class Doodle extends StatelessWidget {
   final DoodleType type;
   final double size;
   const Doodle({Key? key, required this.type, this.size = 100})
-      : super(key: key);
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(
-        painter: DoodlePainter(type: type, context: context),
-      ),
+      child: CustomPaint(painter: DoodlePainter(type: type, context: context)),
     );
   }
 }
@@ -614,10 +615,11 @@ class DoodlePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..strokeWidth = 4
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+    final paint =
+        Paint()
+          ..strokeWidth = 4
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
 
     final path = Path();
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -636,16 +638,28 @@ class DoodlePainter extends CustomPainter {
       case DoodleType.squiggle:
         paint.color = const Color(0xFF58C4A0);
         path.moveTo(size.width * 0.1, size.height * 0.5);
-        path.quadraticBezierTo(size.width * 0.3, size.height * 0.1,
-            size.width * 0.5, size.height * 0.5);
-        path.quadraticBezierTo(size.width * 0.7, size.height * 0.9,
-            size.width * 0.9, size.height * 0.5);
+        path.quadraticBezierTo(
+          size.width * 0.3,
+          size.height * 0.1,
+          size.width * 0.5,
+          size.height * 0.5,
+        );
+        path.quadraticBezierTo(
+          size.width * 0.7,
+          size.height * 0.9,
+          size.width * 0.9,
+          size.height * 0.5,
+        );
         break;
       case DoodleType.arrow:
         paint.color = isDarkMode ? Colors.white : Colors.black;
         path.moveTo(size.width * 0.1, size.height * 0.9);
-        path.quadraticBezierTo(size.width * 0.3, size.height * 0.2,
-            size.width * 0.9, size.height * 0.1);
+        path.quadraticBezierTo(
+          size.width * 0.3,
+          size.height * 0.2,
+          size.width * 0.9,
+          size.height * 0.1,
+        );
         path.moveTo(size.width * 0.7, size.height * 0.05);
         path.lineTo(size.width * 0.9, size.height * 0.1);
         path.lineTo(size.width * 0.85, size.height * 0.3);
@@ -684,78 +698,92 @@ class SlideLayout extends StatelessWidget {
           decoration: BoxDecoration(
             color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
             border: Border.all(
-                color: isDarkMode ? Colors.grey.shade600 : Colors.black,
-                width: 2),
+              color: isDarkMode ? Colors.grey.shade600 : Colors.black,
+              width: 2,
+            ),
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.15),
                 blurRadius: 12,
                 offset: const Offset(8, 8),
-              )
+              ),
             ],
           ),
           child: Column(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: const BoxDecoration(
-                  border:
-                      Border(bottom: BorderSide(color: Colors.black, width: 2)),
+                  border: Border(
+                    bottom: BorderSide(color: Colors.black, width: 2),
+                  ),
                 ),
                 child: Row(
                   children: [
                     Container(
-                        width: 12,
-                        height: 12,
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle, color: Color(0xFF58C4A0))),
+                      width: 12,
+                      height: 12,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFF58C4A0),
+                      ),
+                    ),
                     const SizedBox(width: 8),
                     Container(
-                        width: 12,
-                        height: 12,
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle, color: Color(0xFFE86193))),
+                      width: 12,
+                      height: 12,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFFE86193),
+                      ),
+                    ),
                     const SizedBox(width: 8),
                     Container(
-                        width: 12,
-                        height: 12,
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle, color: Color(0xFFF3B943))),
+                      width: 12,
+                      height: 12,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFFF3B943),
+                      ),
+                    ),
                   ],
                 ),
               ),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      _buildContent(context, fontScale),
-                      if (isFirstSlide) ...[
-                        const Positioned(
-                          top: 0,
-                          left: 20,
-                          child: Doodle(type: DoodleType.star, size: 80),
-                        ),
-                        const Positioned(
-                          top: 0,
-                          right: 0,
-                          child: Doodle(type: DoodleType.squiggle, size: 80),
-                        ),
-                        const Positioned(
-                          bottom: 0,
-                          left: 0,
-                          child: Doodle(type: DoodleType.arrow, size: 80),
-                        ),
-                        const Positioned(
-                          bottom: 20,
-                          right: 20,
-                          child: Doodle(type: DoodleType.zigzag, size: 80),
-                        ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Stack(
+                      children: [
+                        _buildContent(context, fontScale),
+                        if (isFirstSlide) ...[
+                          const Positioned(
+                            top: 0,
+                            left: 20,
+                            child: Doodle(type: DoodleType.star, size: 80),
+                          ),
+                          const Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Doodle(type: DoodleType.squiggle, size: 80),
+                          ),
+                          const Positioned(
+                            bottom: 0,
+                            left: 0,
+                            child: Doodle(type: DoodleType.arrow, size: 80),
+                          ),
+                          const Positioned(
+                            bottom: 20,
+                            right: 20,
+                            child: Doodle(type: DoodleType.zigzag, size: 80),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -777,19 +805,17 @@ class SlideLayout extends StatelessWidget {
             child: Text(
               slide['subtitle'],
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.color
-                        ?.withOpacity(0.7),
-                    fontSize: 26 * fontScale,
-                  ),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.color?.withOpacity(0.7),
+                fontSize: 26 * fontScale,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
         if (slide['subtitle'] != null && slide['subtitle'].isNotEmpty)
           const Divider(height: 32),
-        Expanded(child: slide['widget']),
+        slide['widget'],
       ],
     );
   }
@@ -799,9 +825,11 @@ class AnimatedSlideTitle extends StatefulWidget {
   final String title;
   final double fontScale;
 
-  const AnimatedSlideTitle(
-      {Key? key, required this.title, required this.fontScale})
-      : super(key: key);
+  const AnimatedSlideTitle({
+    Key? key,
+    required this.title,
+    required this.fontScale,
+  }) : super(key: key);
 
   @override
   _AnimatedSlideTitleState createState() => _AnimatedSlideTitleState();
@@ -851,8 +879,8 @@ class _AnimatedSlideTitleState extends State<AnimatedSlideTitle>
           child: Text(
             widget.title,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 38 * widget.fontScale,
-                ),
+              fontSize: 38 * widget.fontScale,
+            ),
             textAlign: TextAlign.center,
           ),
         ),
@@ -864,8 +892,11 @@ class _AnimatedSlideTitleState extends State<AnimatedSlideTitle>
 class BulletPoint extends StatefulWidget {
   final String text;
   final IconData icon;
-  const BulletPoint(this.text,
-      {super.key, this.icon = Icons.check_circle_outline});
+  const BulletPoint(
+    this.text, {
+    super.key,
+    this.icon = Icons.check_circle_outline,
+  });
 
   @override
   State<BulletPoint> createState() => _BulletPointState();
@@ -883,8 +914,10 @@ class _BulletPointState extends State<BulletPoint>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-    _animation = Tween<double>(begin: 1.0, end: 1.15)
-        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _animation = Tween<double>(
+      begin: 1.0,
+      end: 1.15,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _controller.repeat(reverse: true);
   }
 
@@ -906,17 +939,22 @@ class _BulletPointState extends State<BulletPoint>
             padding: const EdgeInsets.only(top: 4.0, right: 12.0),
             child: ScaleTransition(
               scale: _animation,
-              child: Icon(widget.icon,
-                  size: 22.0 * fontScale,
-                  color: Theme.of(context).colorScheme.secondary),
+              child: Icon(
+                widget.icon,
+                size: 22.0 * fontScale,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
             ),
           ),
           Expanded(
-              child: Text(widget.text,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(height: 1.5, fontSize: 20 * fontScale))),
+            child: Text(
+              widget.text,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                height: 1.5,
+                fontSize: 20 * fontScale,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -1007,9 +1045,10 @@ class _AnimatedCodeBracketsState extends State<AnimatedCodeBrackets>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
-    _animation = Tween<double>(begin: -20, end: 20).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: -20,
+      end: 20,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -1024,8 +1063,9 @@ class _AnimatedCodeBracketsState extends State<AnimatedCodeBrackets>
       child: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
-          final iconColor =
-              Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.2);
+          final iconColor = Theme.of(
+            context,
+          ).textTheme.bodyLarge?.color?.withOpacity(0.2);
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -1060,7 +1100,7 @@ class _PlatformIconsAnimationState extends State<PlatformIconsAnimation>
     Icons.phone_android,
     Icons.phone_iphone,
     Icons.web,
-    Icons.desktop_windows
+    Icons.desktop_windows,
   ];
 
   @override
@@ -1100,8 +1140,9 @@ class _PlatformIconsAnimationState extends State<PlatformIconsAnimation>
 
   @override
   Widget build(BuildContext context) {
-    final iconColor =
-        Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.5);
+    final iconColor = Theme.of(
+      context,
+    ).textTheme.bodyLarge?.color?.withOpacity(0.5);
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1145,8 +1186,10 @@ class _InteractiveCounterWidgetState extends State<InteractiveCounterWidget> {
         const SizedBox(height: 16),
         Text(
           '$_counter',
-          style:
-              TextStyle(fontSize: 48 * fontScale, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 48 * fontScale,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 24),
         ElevatedButton.icon(
@@ -1155,7 +1198,9 @@ class _InteractiveCounterWidgetState extends State<InteractiveCounterWidget> {
             foregroundColor: Theme.of(context).colorScheme.onSecondary,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             textStyle: TextStyle(
-                fontSize: 18 * fontScale, fontWeight: FontWeight.w600),
+              fontSize: 18 * fontScale,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           onPressed: _incrementCounter,
           icon: const Icon(Icons.add),
@@ -1180,9 +1225,10 @@ class _WidgetTreeVisualizerState extends State<WidgetTreeVisualizer>
   @override
   void initState() {
     super.initState();
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 3))
-          ..forward();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..forward();
   }
 
   @override
@@ -1220,18 +1266,21 @@ class WidgetTreePainter extends CustomPainter {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final secondaryColor = Theme.of(context).colorScheme.secondary;
 
-    final linePaint = Paint()
-      ..color = (isDarkMode ? Colors.white : Colors.black).withOpacity(0.3)
-      ..strokeWidth = 2.0;
+    final linePaint =
+        Paint()
+          ..color = (isDarkMode ? Colors.white : Colors.black).withOpacity(0.3)
+          ..strokeWidth = 2.0;
 
-    final boxPaint = Paint()
-      ..color = secondaryColor.withOpacity(0.1)
-      ..style = PaintingStyle.fill;
+    final boxPaint =
+        Paint()
+          ..color = secondaryColor.withOpacity(0.1)
+          ..style = PaintingStyle.fill;
 
-    final borderPaint = Paint()
-      ..color = secondaryColor
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke;
+    final borderPaint =
+        Paint()
+          ..color = secondaryColor
+          ..strokeWidth = 2.5
+          ..style = PaintingStyle.stroke;
 
     final textStyle = TextStyle(
       color: primaryColor,
@@ -1271,8 +1320,11 @@ class WidgetTreePainter extends CustomPainter {
         final startNode = nodePositions[connections[i][0]]!;
         final endNode = nodePositions[connections[i][1]]!;
         final lineProgress = ((progress - (i * 0.15)) / 0.2).clamp(0.0, 1.0);
-        canvas.drawLine(startNode,
-            Offset.lerp(startNode, endNode, lineProgress)!, linePaint);
+        canvas.drawLine(
+          startNode,
+          Offset.lerp(startNode, endNode, lineProgress)!,
+          linePaint,
+        );
       }
     }
 
@@ -1280,14 +1332,18 @@ class WidgetTreePainter extends CustomPainter {
     nodePositions.forEach((key, pos) {
       final int index = nodePositions.keys.toList().indexOf(key);
       if (progress > (index * 0.1) + 0.1) {
-        final boxProgress =
-            ((progress - ((index * 0.1) + 0.1)) / 0.2).clamp(0.0, 1.0);
+        final boxProgress = ((progress - ((index * 0.1) + 0.1)) / 0.2).clamp(
+          0.0,
+          1.0,
+        );
         final rect = RRect.fromRectAndRadius(
-            Rect.fromCenter(
-                center: pos,
-                width: 120 * boxProgress,
-                height: 50 * boxProgress),
-            const Radius.circular(8));
+          Rect.fromCenter(
+            center: pos,
+            width: 120 * boxProgress,
+            height: 50 * boxProgress,
+          ),
+          const Radius.circular(8),
+        );
 
         canvas.drawRRect(rect, boxPaint);
         canvas.drawRRect(rect, borderPaint);
@@ -1297,8 +1353,10 @@ class WidgetTreePainter extends CustomPainter {
             text: TextSpan(text: nodeTexts[key], style: textStyle),
             textDirection: TextDirection.ltr,
           )..layout();
-          textPainter.paint(canvas,
-              pos - Offset(textPainter.width / 2, textPainter.height / 2));
+          textPainter.paint(
+            canvas,
+            pos - Offset(textPainter.width / 2, textPainter.height / 2),
+          );
         }
       }
     });
@@ -1313,7 +1371,7 @@ class AnimatedListItem extends StatefulWidget {
   final int index;
   final Widget child;
   const AnimatedListItem({Key? key, required this.index, required this.child})
-      : super(key: key);
+    : super(key: key);
 
   @override
   _AnimatedListItemState createState() => _AnimatedListItemState();
@@ -1354,10 +1412,7 @@ class _AnimatedListItemState extends State<AnimatedListItem>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: _controller,
-      child: SlideTransition(
-        position: _animation,
-        child: widget.child,
-      ),
+      child: SlideTransition(position: _animation, child: widget.child),
     );
   }
 }
@@ -1395,8 +1450,9 @@ class _AnimatedCodeBlockState extends State<AnimatedCodeBlock> {
         color: isDarkMode ? Colors.black.withOpacity(0.3) : Colors.grey[200],
         borderRadius: BorderRadius.circular(12.0),
         border: Border.all(
-            color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade400,
-            width: 0.5),
+          color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade400,
+          width: 0.5,
+        ),
       ),
       child: Stack(
         children: [
@@ -1422,11 +1478,7 @@ class _AnimatedCodeBlockState extends State<AnimatedCodeBlock> {
                 ),
               ],
             ),
-          if (_animationFinished)
-            SelectableText(
-              trimmedCode,
-              style: codeStyle,
-            ),
+          if (_animationFinished) SelectableText(trimmedCode, style: codeStyle),
         ],
       ),
     );
@@ -1450,29 +1502,37 @@ class _InstallationStepsAnimationState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         AnimatedListItem(
-            index: 0,
-            child: InstallationStep(
-                icon: Icons.cloud_download_outlined,
-                title: "1. Install Flutter SDK",
-                subtitle: "Download from the official website.")),
+          index: 0,
+          child: InstallationStep(
+            icon: Icons.cloud_download_outlined,
+            title: "1. Install Flutter SDK",
+            subtitle: "Download from the official website.",
+          ),
+        ),
         AnimatedListItem(
-            index: 1,
-            child: InstallationStep(
-                icon: Icons.code,
-                title: "2. Set up an Editor",
-                subtitle: "VS Code or Android Studio are recommended.")),
+          index: 1,
+          child: InstallationStep(
+            icon: Icons.code,
+            title: "2. Set up an Editor",
+            subtitle: "VS Code or Android Studio are recommended.",
+          ),
+        ),
         AnimatedListItem(
-            index: 2,
-            child: InstallationStep(
-                icon: Icons.extension_outlined,
-                title: "3. Install Plugins",
-                subtitle: "Add Flutter & Dart support to your editor.")),
+          index: 2,
+          child: InstallationStep(
+            icon: Icons.extension_outlined,
+            title: "3. Install Plugins",
+            subtitle: "Add Flutter & Dart support to your editor.",
+          ),
+        ),
         AnimatedListItem(
-            index: 3,
-            child: InstallationStep(
-                icon: Icons.health_and_safety_outlined,
-                title: "4. Run `flutter doctor`",
-                subtitle: "A command to check if your setup is ready!")),
+          index: 3,
+          child: InstallationStep(
+            icon: Icons.health_and_safety_outlined,
+            title: "4. Run `flutter doctor`",
+            subtitle: "A command to check if your setup is ready!",
+          ),
+        ),
       ],
     );
   }
@@ -1483,12 +1543,12 @@ class InstallationStep extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const InstallationStep(
-      {Key? key,
-      required this.icon,
-      required this.title,
-      required this.subtitle})
-      : super(key: key);
+  const InstallationStep({
+    Key? key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -1496,10 +1556,12 @@ class InstallationStep extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Theme.of(context).colorScheme.secondary.withOpacity(0.05),
-          border: Border.all(
-              color: Theme.of(context).colorScheme.secondary.withOpacity(0.2))),
+        borderRadius: BorderRadius.circular(12),
+        color: Theme.of(context).colorScheme.secondary.withOpacity(0.05),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+        ),
+      ),
       child: Row(
         children: [
           Icon(icon, size: 32, color: Theme.of(context).colorScheme.secondary),
@@ -1508,21 +1570,26 @@ class InstallationStep extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 18)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(subtitle,
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.color
-                            ?.withOpacity(0.7))),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  ),
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -1563,8 +1630,10 @@ class _FrameworkComparisonGraphState extends State<FrameworkComparisonGraph>
       builder: (context, child) {
         return CustomPaint(
           size: const Size(double.infinity, double.infinity),
-          painter:
-              GraphPainter(animationValue: _controller.value, context: context),
+          painter: GraphPainter(
+            animationValue: _controller.value,
+            context: context,
+          ),
         );
       },
     );
@@ -1585,22 +1654,28 @@ class GraphPainter extends CustomPainter {
       {'name': 'Flutter', 'value': 90.0, 'color': Colors.cyan},
     ];
 
-    final linePaint = Paint()
-      ..color = (isDarkMode ? Colors.white : Colors.black).withOpacity(0.3)
-      ..strokeWidth = 1.0;
+    final linePaint =
+        Paint()
+          ..color = (isDarkMode ? Colors.white : Colors.black).withOpacity(0.3)
+          ..strokeWidth = 1.0;
 
     // Draw axis lines
     canvas.drawLine(
-        Offset(0, size.height), Offset(size.width, size.height), linePaint);
+      Offset(0, size.height),
+      Offset(size.width, size.height),
+      linePaint,
+    );
 
     double barSpacing = 40.0;
-    double barWidth = (size.width - (barSpacing * (frameworks.length + 1))) /
+    double barWidth =
+        (size.width - (barSpacing * (frameworks.length + 1))) /
         frameworks.length;
     double maxVal = 100.0;
 
     for (int i = 0; i < frameworks.length; i++) {
       final framework = frameworks[i];
-      final barHeight = (framework['value'] as double) /
+      final barHeight =
+          (framework['value'] as double) /
           maxVal *
           size.height *
           animationValue;
@@ -1610,7 +1685,9 @@ class GraphPainter extends CustomPainter {
       final top = size.height - barHeight;
       final rect = Rect.fromLTWH(left, top, barWidth, barHeight);
       canvas.drawRRect(
-          RRect.fromRectAndRadius(rect, const Radius.circular(8)), barPaint);
+        RRect.fromRectAndRadius(rect, const Radius.circular(8)),
+        barPaint,
+      );
 
       // Draw framework name
       final textPainter = TextPainter(
@@ -1626,9 +1703,9 @@ class GraphPainter extends CustomPainter {
       )..layout();
 
       textPainter.paint(
-          canvas,
-          Offset(
-              left + barWidth / 2 - textPainter.width / 2, size.height + 10));
+        canvas,
+        Offset(left + barWidth / 2 - textPainter.width / 2, size.height + 10),
+      );
 
       // Draw value on top
       if (animationValue > 0.8) {
@@ -1645,15 +1722,17 @@ class GraphPainter extends CustomPainter {
         )..layout();
 
         final valueOpacity = ((animationValue - 0.8) / 0.2).clamp(0.0, 1.0);
-        final valuePaint = Paint()
-          ..color = (isDarkMode ? Colors.black : Colors.white)
-              .withOpacity(valueOpacity);
+        final valuePaint =
+            Paint()
+              ..color = (isDarkMode ? Colors.black : Colors.white).withOpacity(
+                valueOpacity,
+              );
 
         if (barHeight > 30) {
           valueTextPainter.paint(
-              canvas,
-              Offset(
-                  left + barWidth / 2 - valueTextPainter.width / 2, top + 10));
+            canvas,
+            Offset(left + barWidth / 2 - valueTextPainter.width / 2, top + 10),
+          );
         }
       }
     }
@@ -1677,19 +1756,24 @@ class QuizSlide extends StatefulWidget {
 class _QuizSlideState extends State<QuizSlide> {
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      itemCount: widget.questions.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
-      itemBuilder: (context, index) {
-        final q = widget.questions[index];
-        return QuizCard(
-          question: q['question']!,
-          hint: q['hint']!,
-          answer: q['answer']!,
-          index: index,
-        );
-      },
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          children: List.generate(widget.questions.length, (index) {
+            final q = widget.questions[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: QuizCard(
+                question: q['question']!,
+                hint: q['hint']!,
+                answer: q['answer']!,
+                index: index,
+              ),
+            );
+          }),
+        ),
+      ),
     );
   }
 }
@@ -1700,13 +1784,13 @@ class QuizCard extends StatefulWidget {
   final String answer;
   final int index;
 
-  const QuizCard(
-      {Key? key,
-      required this.question,
-      required this.hint,
-      required this.answer,
-      required this.index})
-      : super(key: key);
+  const QuizCard({
+    Key? key,
+    required this.question,
+    required this.hint,
+    required this.answer,
+    required this.index,
+  }) : super(key: key);
 
   @override
   _QuizCardState createState() => _QuizCardState();
@@ -1747,49 +1831,47 @@ class _QuizCardState extends State<QuizCard> {
                 const Divider(height: 24, thickness: 0.5),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) => FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  ),
-                  child: _isAnswerVisible
-                      ? Text(
-                          widget.answer,
-                          key: const ValueKey('answer'),
-                          style: TextStyle(
-                            fontSize: 18 * fontScale,
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        )
-                      : Row(
-                          key: const ValueKey('hint'),
-                          children: [
-                            Icon(
-                              Icons.lightbulb_outline,
-                              size: 18 * fontScale,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.color
-                                  ?.withOpacity(0.7),
+                  transitionBuilder:
+                      (child, animation) =>
+                          FadeTransition(opacity: animation, child: child),
+                  child:
+                      _isAnswerVisible
+                          ? Text(
+                            widget.answer,
+                            key: const ValueKey('answer'),
+                            style: TextStyle(
+                              fontSize: 18 * fontScale,
+                              color: Theme.of(context).colorScheme.secondary,
+                              fontWeight: FontWeight.w600,
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                widget.hint,
-                                style: TextStyle(
-                                  fontSize: 16 * fontScale,
-                                  fontStyle: FontStyle.italic,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.color
-                                      ?.withOpacity(0.7),
+                          )
+                          : Row(
+                            key: const ValueKey('hint'),
+                            children: [
+                              Icon(
+                                Icons.lightbulb_outline,
+                                size: 18 * fontScale,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.color?.withOpacity(0.7),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  widget.hint,
+                                  style: TextStyle(
+                                    fontSize: 16 * fontScale,
+                                    fontStyle: FontStyle.italic,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color
+                                        ?.withOpacity(0.7),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                 ),
               ],
             ),
@@ -1816,7 +1898,8 @@ class AnimatedSlidePage extends StatefulWidget {
   State<AnimatedSlidePage> createState() => _AnimatedSlidePageState();
 }
 
-class _AnimatedSlidePageState extends State<AnimatedSlidePage> with TickerProviderStateMixin {
+class _AnimatedSlidePageState extends State<AnimatedSlidePage>
+    with TickerProviderStateMixin {
   late Animation<double> _animation;
   late AnimationController _controller;
 
@@ -1827,9 +1910,10 @@ class _AnimatedSlidePageState extends State<AnimatedSlidePage> with TickerProvid
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _controller.forward();
   }
 
@@ -1845,14 +1929,12 @@ class _AnimatedSlidePageState extends State<AnimatedSlidePage> with TickerProvid
       animation: _animation,
       builder: (context, child) {
         return Transform(
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.001)
-            ..rotateY((1 - _animation.value) * -0.8),
+          transform:
+              Matrix4.identity()
+                ..setEntry(3, 2, 0.001)
+                ..rotateY((1 - _animation.value) * -0.8),
           alignment: Alignment.center,
-          child: Opacity(
-            opacity: _animation.value,
-            child: child,
-          ),
+          child: Opacity(opacity: _animation.value, child: child),
         );
       },
       child: widget.child,
@@ -1878,19 +1960,22 @@ final List<Map<String, dynamic>> slides = [
           AnimatedListItem(
             index: 0,
             child: BulletPoint(
-                "A UI toolkit from Google to build beautiful apps for any screen."),
+              "A UI toolkit from Google to build beautiful apps for any screen.",
+            ),
           ),
           SizedBox(height: 16),
           AnimatedListItem(
             index: 1,
             child: BulletPoint(
-                "Write code once in Dart, compile to native for mobile, web & desktop."),
+              "Write code once in Dart, compile to native for mobile, web & desktop.",
+            ),
           ),
           SizedBox(height: 16),
           AnimatedListItem(
             index: 2,
             child: BulletPoint(
-                "Known for high performance and a rich widget library."),
+              "Known for high performance and a rich widget library.",
+            ),
           ),
         ],
       ),
@@ -1911,14 +1996,18 @@ final List<Map<String, dynamic>> slides = [
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AnimatedListItem(
-              index: 0,
-              child: BulletPoint(
-                  "In Flutter, almost everything is a widget - from a simple button to the entire screen layout.")),
+            index: 0,
+            child: BulletPoint(
+              "In Flutter, almost everything is a widget - from a simple button to the entire screen layout.",
+            ),
+          ),
           SizedBox(height: 16),
           AnimatedListItem(
-              index: 1,
-              child: BulletPoint(
-                  "You build your UI by composing widgets inside other widgets, forming a 'Widget Tree'.")),
+            index: 1,
+            child: BulletPoint(
+              "You build your UI by composing widgets inside other widgets, forming a 'Widget Tree'.",
+            ),
+          ),
         ],
       ),
       right: WidgetTreeVisualizer(),
@@ -1933,16 +2022,20 @@ final List<Map<String, dynamic>> slides = [
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AnimatedListItem(
-              index: 0,
-              child: BulletPoint(
-                  "StatelessWidget: Dumb widgets that don't change over time. Once drawn, they stay the same. E.g., an icon, a label.",
-                  icon: Icons.crop_portrait)),
+            index: 0,
+            child: BulletPoint(
+              "StatelessWidget: Dumb widgets that don't change over time. Once drawn, they stay the same. E.g., an icon, a label.",
+              icon: Icons.crop_portrait,
+            ),
+          ),
           SizedBox(height: 24),
           AnimatedListItem(
-              index: 1,
-              child: BulletPoint(
-                  "StatefulWidget: Smart widgets that can change dynamically. They hold 'state' that can be updated, causing the widget to redraw.",
-                  icon: Icons.dynamic_feed)),
+            index: 1,
+            child: BulletPoint(
+              "StatefulWidget: Smart widgets that can change dynamically. They hold 'state' that can be updated, causing the widget to redraw.",
+              icon: Icons.dynamic_feed,
+            ),
+          ),
         ],
       ),
       right: InteractiveCounterWidget(),
@@ -1979,17 +2072,20 @@ final List<Map<String, dynamic>> slides = [
           AnimatedListItem(
             index: 0,
             child: BulletPoint(
-                "Dart is a modern, object-oriented language developed by Google."),
+              "Dart is a modern, object-oriented language developed by Google.",
+            ),
           ),
           AnimatedListItem(
             index: 1,
             child: BulletPoint(
-                "It's optimized for building fast, cross-platform apps."),
+              "It's optimized for building fast, cross-platform apps.",
+            ),
           ),
           AnimatedListItem(
             index: 2,
             child: BulletPoint(
-                "Flutter uses Dart for all app logic and UI code."),
+              "Flutter uses Dart for all app logic and UI code.",
+            ),
           ),
         ],
       ),
@@ -2000,30 +2096,31 @@ final List<Map<String, dynamic>> slides = [
     'title': 'Dart: Variables & Core Data Types',
     'subtitle': 'Storing information in your app',
     'widget': Builder(
-      builder: (context) => TwoColumnLayout(
-        left: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  'Dart supports several core data types for storing information:',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      'Dart supports several core data types for storing information:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  BulletPoint('String: For text values.'),
+                  BulletPoint('int: For whole numbers.'),
+                  BulletPoint('double: For decimal numbers.'),
+                  BulletPoint('bool: For true/false values.'),
+                  BulletPoint('var: Lets Dart infer the type.'),
+                ],
               ),
-              BulletPoint('String: For text values.'),
-              BulletPoint('int: For whole numbers.'),
-              BulletPoint('double: For decimal numbers.'),
-              BulletPoint('bool: For true/false values.'),
-              BulletPoint('var: Lets Dart infer the type.'),
-            ],
-          ),
-        ),
-        right: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: AnimatedCodeBlock('''
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
 // Use 'String' for text
 String name = "Flutter";
 
@@ -2039,39 +2136,40 @@ bool isAwesome = true;
 // Use 'var' to let Dart figure out the type
 var myVariable = "Dart is smart!";
 '''),
-        ),
-      ),
+            ),
+          ),
     ),
   },
   {
     'title': 'Dart: Collection Types',
     'subtitle': 'Storing groups of data',
     'widget': Builder(
-      builder: (context) => TwoColumnLayout(
-        left: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  'Dart provides collections like List and Map to store multiple values:',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      'Dart provides collections like List and Map to store multiple values:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  BulletPoint('List: An ordered collection of items.'),
+                  BulletPoint('Map: A collection of key-value pairs.'),
+                ],
               ),
-              BulletPoint('List: An ordered collection of items.'),
-              BulletPoint('Map: A collection of key-value pairs.'),
-            ],
-          ),
-        ),
-        right: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: AnimatedCodeBlock('''
+            ),
+            right: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: AnimatedCodeBlock('''
 // List: An ordered collection of items.
 List<String> planets = [
   "Mercury",
@@ -2082,11 +2180,11 @@ List<String> planets = [
 // Access items by index (starts at 0)
 String firstPlanet = planets[0]; // "Mercury"
 '''),
-              ),
-              SizedBox(height: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: AnimatedCodeBlock('''
+                  ),
+                  SizedBox(height: 16),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: AnimatedCodeBlock('''
 // Map: A collection of key-value pairs.
 Map<String, String> capitals = {
   "USA": "Washington D.C.",
@@ -2096,39 +2194,40 @@ Map<String, String> capitals = {
 // Access values by key
 String usCapital = capitals["USA"]!;
 '''),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     ),
   },
   {
     'title': 'Dart: Operators',
     'subtitle': 'Performing actions on your data',
     'widget': Builder(
-      builder: (context) => TwoColumnLayout(
-        left: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  'Operators let you perform calculations and comparisons:',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      'Operators let you perform calculations and comparisons:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  BulletPoint('Arithmetic: +, -, *, /'),
+                  BulletPoint('Equality: ==, !='),
+                  BulletPoint('Logical: &&, ||'),
+                ],
               ),
-              BulletPoint('Arithmetic: +, -, *, /'),
-              BulletPoint('Equality: ==, !='),
-              BulletPoint('Logical: &&, ||'),
-            ],
-          ),
-        ),
-        right: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: AnimatedCodeBlock('''
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
 // Arithmetic Operators
 int a = 10 + 5; // 15
 double b = 20 / 4; // 5.0
@@ -2141,33 +2240,34 @@ bool notEqual = (10 != 5); // true
 bool bothTrue = (areEqual && notEqual); // false
 bool oneIsTrue = (areEqual || notEqual); // true
 '''),
-        ),
-      ),
+            ),
+          ),
     ),
   },
   {
     'title': 'Dart: Functions',
     'subtitle': 'Reusable blocks of code',
     'widget': Builder(
-      builder: (context) => TwoColumnLayout(
-        left: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  'Functions let you organize and reuse code. They can take parameters and return values:',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      'Functions let you organize and reuse code. They can take parameters and return values:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        right: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: AnimatedCodeBlock('''
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
 // A simple function that takes a name and returns a greeting.
 String sayHello(String name) {
   return "Hello, " + name + "!";
@@ -2186,33 +2286,34 @@ void main() {
   // "Message from Admin: Welcome to Dart!"
 }
 '''),
-        ),
-      ),
+            ),
+          ),
     ),
   },
   {
     'title': 'Dart Program: Shopping Bill',
     'subtitle': 'Let\'s write a simple program together',
     'widget': Builder(
-      builder: (context) => TwoColumnLayout(
-        left: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  'Here\'s a real-world example: Calculate a shopping bill with tax.',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      'Here\'s a real-world example: Calculate a shopping bill with tax.',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        right: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: AnimatedCodeBlock('''
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
 // Calculates the total bill for a map of items and their prices.
 double calculateTotalBill(Map<String, double> items) {
   double total = 0.0;
@@ -2241,8 +2342,8 @@ void main() {
   // Output: Your total bill is: \$ 20.34
 }
 '''),
-        ),
-      ),
+            ),
+          ),
     ),
   },
   {
@@ -2254,13 +2355,16 @@ void main() {
       children: [
         BulletPoint('Dart is the language behind Flutter.'),
         BulletPoint(
-            'It has familiar types: String, int, double, bool, List, Map.'),
+          'It has familiar types: String, int, double, bool, List, Map.',
+        ),
         BulletPoint(
-            'Functions and operators help you organize and manipulate data.'),
+          'Functions and operators help you organize and manipulate data.',
+        ),
         BulletPoint('You can now read and write basic Dart code!'),
         SizedBox(height: 24),
         Center(
-            child: Icon(Icons.celebration, size: 80, color: Colors.cyanAccent)),
+          child: Icon(Icons.celebration, size: 80, color: Colors.cyanAccent),
+        ),
       ],
     ),
   },
@@ -2270,14 +2374,12 @@ void main() {
     'widget': const QuizSlide(
       questions: [
         {
-          'question':
-              'What data type would you use to store a list of names?',
+          'question': 'What data type would you use to store a list of names?',
           'hint': 'It\'s an ordered collection.',
           'answer': 'List<String>',
         },
         {
-          'question':
-              'How do you define a function that returns a number?',
+          'question': 'How do you define a function that returns a number?',
           'hint': 'Specify the return type before the function name.',
           'answer': 'int myFunction() { ... } or double myFunction() { ... }',
         },
@@ -2289,74 +2391,79 @@ void main() {
     'title': 'Module 3: Your First Flutter App',
     'subtitle': 'From Project Creation to "Hello World"',
     'widget': Builder(
-      builder: (context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: 12.0),
-            child: Text(
-              'Let\'s see how a basic Flutter app is structured, from project creation to your first widget tree.',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+      builder:
+          (context) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(bottom: 12.0),
+                child: Text(
+                  'Let\'s see how a basic Flutter app is structured, from project creation to your first widget tree.',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              Expanded(child: AnimatedCodeBrackets()),
+            ],
           ),
-          Expanded(child: AnimatedCodeBrackets()),
-        ],
-      ),
     ),
   },
   {
     'title': 'Project Folders & pubspec.yaml',
     'subtitle': 'Where your code and configurations live',
     'widget': Builder(
-      builder: (context) => TwoColumnLayout(
-        left: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
-                child: Text(
-                  'Your Flutter project has a specific folder structure. Here\'s what matters most:',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Text(
+                      'Your Flutter project has a specific folder structure. Here\'s what matters most:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  AnimatedListItem(
+                    index: 0,
+                    child: BulletPoint(
+                      "lib/: Contains all your Dart code. Your main logic goes here.",
+                      icon: Icons.folder_special,
+                    ),
+                  ),
+                  AnimatedListItem(
+                    index: 1,
+                    child: BulletPoint(
+                      "pubspec.yaml: The most important config file. Manage packages (dependencies) and assets (images, fonts) here.",
+                      icon: Icons.settings,
+                    ),
+                  ),
+                  AnimatedListItem(
+                    index: 2,
+                    child: BulletPoint(
+                      "ios/ & android/: Platform-specific project folders. You rarely need to edit these.",
+                      icon: Icons.phone_android,
+                    ),
+                  ),
+                ],
               ),
-              AnimatedListItem(
-                index: 0,
-                child: BulletPoint(
-                    "lib/: Contains all your Dart code. Your main logic goes here.",
-                    icon: Icons.folder_special),
-              ),
-              AnimatedListItem(
-                index: 1,
-                child: BulletPoint(
-                    "pubspec.yaml: The most important config file. Manage packages (dependencies) and assets (images, fonts) here.",
-                    icon: Icons.settings),
-              ),
-              AnimatedListItem(
-                index: 2,
-                child: BulletPoint(
-                    "ios/ & android/: Platform-specific project folders. You rarely need to edit these.",
-                    icon: Icons.phone_android),
-              ),
-            ],
-          ),
-        ),
-        right: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  'The pubspec.yaml file manages dependencies and assets:',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: AnimatedCodeBlock('''
+            ),
+            right: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      'The pubspec.yaml file manages dependencies and assets:',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: AnimatedCodeBlock('''
 # pubspec.yaml
 name: my_app
 
@@ -2375,36 +2482,37 @@ flutter:
   assets:
     - assets/images/logo.png
 '''),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     ),
   },
   {
     'title': 'Anatomy of main.dart',
     'subtitle': 'The entry point of your Flutter app',
     'widget': Builder(
-      builder: (context) => TwoColumnLayout(
-        left: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
-                child: Text(
-                  'The main.dart file is where your app starts. It defines the root widget and the app\'s entry point:',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Text(
+                      'The main.dart file is where your app starts. It defines the root widget and the app\'s entry point:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        right: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: AnimatedCodeBlock('''
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
 import 'package:flutter/material.dart';
 
 // 1. The main() function is where your app starts.
@@ -2432,33 +2540,34 @@ class MyApp extends StatelessWidget {
   }
 }
 '''),
-        ),
-      ),
+            ),
+          ),
     ),
   },
   {
     'title': 'Hello World!',
     'subtitle': 'Let\'s run your first app',
     'widget': Builder(
-      builder: (context) => TwoColumnLayout(
-        left: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
-                child: Text(
-                  'Here\'s a minimal Flutter app that displays "Hello, World!" on the screen:',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Text(
+                      'Here\'s a minimal Flutter app that displays "Hello, World!" on the screen:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        right: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: AnimatedCodeBlock('''
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
 import 'package:flutter/material.dart';
 
 void main() => runApp(const HelloWorldApp());
@@ -2488,8 +2597,8 @@ class HelloWorldApp extends StatelessWidget {
   }
 }
 '''),
-        ),
-      ),
+            ),
+          ),
     ),
   },
   {
@@ -2516,14 +2625,1091 @@ class HelloWorldApp extends StatelessWidget {
     'title': 'Q&A and Next Steps',
     'subtitle': 'Thank you!',
     'widget': Builder(
-      builder: (context) => Center(
-          child: Icon(Icons.question_answer_outlined,
+      builder:
+          (context) => Center(
+            child: Icon(
+              Icons.question_answer_outlined,
               size: 250,
-              color: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.color
-                  ?.withOpacity(0.2))),
+              color: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.color?.withOpacity(0.2),
+            ),
+          ),
+    ),
+  },
+  // Module 4: Understanding Widgets
+  {
+    'title': 'Module 4: Understanding Widgets',
+    'subtitle': 'The Building Blocks of Flutter UI',
+    'widget': TwoColumnLayout(
+      left: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedListItem(
+            index: 0,
+            child: BulletPoint(
+              "Widgets are the basic building blocks of Flutter UI - like LEGO pieces!",
+              icon: Icons.extension,
+            ),
+          ),
+          SizedBox(height: 16),
+          AnimatedListItem(
+            index: 1,
+            child: BulletPoint(
+              "StatelessWidget: Static UI elements that don't change",
+              icon: Icons.crop_portrait,
+            ),
+          ),
+          SizedBox(height: 16),
+          AnimatedListItem(
+            index: 2,
+            child: BulletPoint(
+              "StatefulWidget: Dynamic UI elements that can change over time",
+              icon: Icons.dynamic_feed,
+            ),
+          ),
+        ],
+      ),
+      right: Builder(
+        builder:
+            (context) => SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+// StatelessWidget Example
+class WelcomeMessage extends StatelessWidget {
+  const WelcomeMessage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text(
+      'Welcome to Flutter!',
+      style: TextStyle(fontSize: 24),
+    );
+  }
+}
+
+// StatefulWidget Example
+class Counter extends StatefulWidget {
+  const Counter({super.key});
+
+  @override
+  State<Counter> createState() => _CounterState();
+}
+
+class _CounterState extends State<Counter> {
+  int count = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text('Count: \$count'),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              count++;
+            });
+          },
+          child: const Text('Increment'),
+        ),
+      ],
+    );
+  }
+}
+'''),
+            ),
+      ),
+    ),
+  },
+  {
+    'title': 'Commonly Used Widgets',
+    'subtitle': 'The Essential Building Blocks',
+    'widget': Builder(
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  BulletPoint(
+                    'Container: A box that can be styled and positioned',
+                  ),
+                  BulletPoint('Text: For displaying text with various styles'),
+                  BulletPoint(
+                    'Image: For displaying images from various sources',
+                  ),
+                  BulletPoint('Column: Arranges widgets vertically'),
+                  BulletPoint('Row: Arranges widgets horizontally'),
+                ],
+              ),
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+// Example of common widgets
+Container(
+  padding: const EdgeInsets.all(16),
+  decoration: BoxDecoration(
+    color: Colors.blue,
+    borderRadius: BorderRadius.circular(8),
+  ),
+  child: Column(
+    children: [
+      const Text(
+        'John Doe',
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      const SizedBox(height: 8),
+      Image.network(
+        'https://example.com/profile.jpg',
+        width: 100,
+        height: 100,
+      ),
+      const SizedBox(height: 8),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.email),
+          SizedBox(width: 8),
+          Text('john@example.com'),
+        ],
+      ),
+    ],
+  ),
+)
+'''),
+            ),
+          ),
+    ),
+  },
+  {
+    'title': 'Building a Profile Screen',
+    'subtitle': 'Putting Widgets Together',
+    'widget': Builder(
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Text(
+                      'Let\'s build a profile screen using what we learned:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          // Profile Image
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.blue,
+                width: 2,
+              ),
+            ),
+            child: const CircleAvatar(
+              backgroundImage: NetworkImage(
+                'https://example.com/profile.jpg',
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Name
+          const Text(
+            'John Doe',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Title
+          const Text(
+            'Flutter Developer',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Bio
+          const Text(
+            'Passionate about building beautiful mobile apps with Flutter.',
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+'''),
+            ),
+          ),
+    ),
+  },
+  // Module 5: Layout and Styling
+  {
+    'title': 'Module 5: Layout and Styling',
+    'subtitle': 'Creating Beautiful UIs',
+    'widget': TwoColumnLayout(
+      left: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedListItem(
+            index: 0,
+            child: BulletPoint(
+              "Flutter uses a powerful layout system based on constraints",
+              icon: Icons.grid_view,
+            ),
+          ),
+          SizedBox(height: 16),
+          AnimatedListItem(
+            index: 1,
+            child: BulletPoint(
+              "Padding and Margin control spacing around widgets",
+              icon: Icons.space_bar,
+            ),
+          ),
+          SizedBox(height: 16),
+          AnimatedListItem(
+            index: 2,
+            child: BulletPoint(
+              "Alignment helps position widgets within their containers",
+              icon: Icons.align_horizontal_center,
+            ),
+          ),
+        ],
+      ),
+      right: Builder(
+        builder:
+            (context) => SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+// Example of layout widgets
+Container(
+  margin: const EdgeInsets.all(16),
+  padding: const EdgeInsets.all(16),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(8),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.1),
+        blurRadius: 8,
+        offset: const Offset(0, 2),
+      ),
+    ],
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text('Weather Card'),
+      const SizedBox(height: 8),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Sunny'),
+          Icon(Icons.wb_sunny, color: Colors.orange),
+        ],
+      ),
+    ],
+  ),
+)
+'''),
+            ),
+      ),
+    ),
+  },
+  {
+    'title': 'Creating a Weather Card',
+    'subtitle': 'Putting Layout and Styling Together',
+    'widget': Builder(
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Text(
+                      'Let\'s create a beautiful weather card:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+class WeatherCard extends StatelessWidget {
+  final String condition;
+  final int temperature;
+  final IconData icon;
+
+  const WeatherCard({
+    super.key,
+    required this.condition,
+    required this.temperature,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade300, Colors.blue.shade600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 64, color: Colors.white),
+          const SizedBox(height: 16),
+          Text(
+            condition,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '\$temperature°C',
+            style: const TextStyle(
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+'''),
+            ),
+          ),
+    ),
+  },
+  // Module 6: Adding Interactivity
+  {
+    'title': 'Module 6: Adding Interactivity',
+    'subtitle': 'Making Your App Respond to User Input',
+    'widget': TwoColumnLayout(
+      left: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedListItem(
+            index: 0,
+            child: BulletPoint(
+              "StatefulWidgets manage changing data",
+              icon: Icons.toggle_on,
+            ),
+          ),
+          SizedBox(height: 16),
+          AnimatedListItem(
+            index: 1,
+            child: BulletPoint(
+              "TextFields capture user input",
+              icon: Icons.edit,
+            ),
+          ),
+          SizedBox(height: 16),
+          AnimatedListItem(
+            index: 2,
+            child: BulletPoint(
+              "Buttons trigger actions",
+              icon: Icons.touch_app,
+            ),
+          ),
+        ],
+      ),
+      right: Builder(
+        builder:
+            (context) => SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+// Example of interactive widgets
+class InteractiveForm extends StatefulWidget {
+  const InteractiveForm({super.key});
+
+  @override
+  State<InteractiveForm> createState() => _InteractiveFormState();
+}
+
+class _InteractiveFormState extends State<InteractiveForm> {
+  final _formKey = GlobalKey<FormState>();
+  String _email = '';
+  String _password = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Email',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (value) {
+              setState(() {
+                _email = value;
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Password',
+              border: OutlineInputBorder(),
+            ),
+            obscureText: true,
+            onChanged: (value) {
+              setState(() {
+                _password = value;
+              });
+            },
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                // Handle form submission
+              }
+            },
+            child: const Text('Submit'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+'''),
+            ),
+      ),
+    ),
+  },
+  {
+    'title': 'Building a Login Screen',
+    'subtitle': 'Putting Interactivity to Work',
+    'widget': Builder(
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Text(
+                      'Let\'s create a complete login screen:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Welcome Back!',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 32),
+            TextFormField(
+              controller: _emailController,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.email),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _passwordController,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.lock),
+              ),
+              obscureText: true,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your password';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _handleLogin,
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text('Login'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleLogin() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      
+      // Simulate login
+      await Future.delayed(const Duration(seconds: 2));
+      
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+}
+'''),
+            ),
+          ),
+    ),
+  },
+  {
+    'title': 'Module 4-6: Quiz',
+    'subtitle': 'Test Your Knowledge!',
+    'widget': const QuizSlide(
+      questions: [
+        {
+          'question':
+              'What is the main difference between StatelessWidget and StatefulWidget?',
+          'hint': 'Think about how they handle changes.',
+          'answer':
+              'StatelessWidget is immutable and cannot change, while StatefulWidget can maintain state and update its UI.',
+        },
+        {
+          'question': 'Which widget would you use to arrange items vertically?',
+          'hint': 'It\'s like stacking blocks.',
+          'answer': 'Column',
+        },
+        {
+          'question': 'What is the purpose of setState() in a StatefulWidget?',
+          'hint': 'It tells Flutter something has changed.',
+          'answer':
+              'setState() notifies Flutter that the state has changed and triggers a rebuild of the widget.',
+        },
+      ],
+    ),
+  },
+  // Module 7: Navigation
+  {
+    'title': 'Module 7: Navigation in Flutter',
+    'subtitle': 'Moving Between Screens',
+    'widget': TwoColumnLayout(
+      left: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedListItem(
+            index: 0,
+            child: BulletPoint(
+              "Navigation is like turning pages in a notebook - moving between different screens",
+              icon: Icons.navigation,
+            ),
+          ),
+          SizedBox(height: 16),
+          AnimatedListItem(
+            index: 1,
+            child: BulletPoint(
+              "Navigator manages the stack of screens in your app",
+              icon: Icons.layers,
+            ),
+          ),
+          SizedBox(height: 16),
+          AnimatedListItem(
+            index: 2,
+            child: BulletPoint(
+              "Routes can be pushed (add), popped (remove), or replaced",
+              icon: Icons.swap_horiz,
+            ),
+          ),
+        ],
+      ),
+      right: Builder(
+        builder:
+            (context) => SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+// Basic Navigation Example
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Home')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            // Navigate to DetailScreen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailScreen(),
+              ),
+            );
+          },
+          child: Text('Go to Details'),
+        ),
+      ),
+    );
+  }
+}
+
+class DetailScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Details'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Center(
+        child: Text('This is the detail screen!'),
+      ),
+    );
+  }
+}
+'''),
+            ),
+      ),
+    ),
+  },
+  {
+    'title': 'Named Routes',
+    'subtitle': 'Organized Navigation',
+    'widget': Builder(
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Text(
+                      'Named routes make navigation more organized:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+// Named Routes Example
+void main() {
+  runApp(MaterialApp(
+    initialRoute: '/',
+    routes: {
+      '/': (context) => HomeScreen(),
+      '/details': (context) => DetailScreen(),
+    },
+  ));
+}
+
+// In HomeScreen
+ElevatedButton(
+  onPressed: () {
+    Navigator.pushNamed(context, '/details');
+  },
+  child: Text('Go to Details'),
+)
+
+// In DetailScreen
+ElevatedButton(
+  onPressed: () {
+    Navigator.pop(context);
+  },
+  child: Text('Go Back'),
+)
+'''),
+            ),
+          ),
+    ),
+  },
+  // Module 8: State Management
+  {
+    'title': 'Module 8: Managing State',
+    'subtitle': 'Handling Data in Your App',
+    'widget': TwoColumnLayout(
+      left: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedListItem(
+            index: 0,
+            child: BulletPoint(
+              "State is any data that can change in your app",
+              icon: Icons.data_array,
+            ),
+          ),
+          SizedBox(height: 16),
+          AnimatedListItem(
+            index: 1,
+            child: BulletPoint(
+              "setState is for simple state changes within a widget",
+              icon: Icons.refresh,
+            ),
+          ),
+          SizedBox(height: 16),
+          AnimatedListItem(
+            index: 2,
+            child: BulletPoint(
+              "Provider is for sharing state between widgets",
+              icon: Icons.share,
+            ),
+          ),
+        ],
+      ),
+      right: Builder(
+        builder:
+            (context) => SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+// Simple State Management with setState
+class Counter extends StatefulWidget {
+  @override
+  _CounterState createState() => _CounterState();
+}
+
+class _CounterState extends State<Counter> {
+  int count = 0;
+
+  void increment() {
+    setState(() {
+      count++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text('Count: \$count'),
+        ElevatedButton(
+          onPressed: increment,
+          child: Text('Increment'),
+        ),
+      ],
+    );
+  }
+}
+
+// State Management with Provider
+class CounterProvider extends ChangeNotifier {
+  int count = 0;
+
+  void increment() {
+    count++;
+    notifyListeners();
+  }
+}
+
+// In main.dart
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => CounterProvider(),
+      child: MyApp(),
+    ),
+  );
+}
+
+// In any widget
+final counter = Provider.of<CounterProvider>(context);
+// or
+final counter = context.watch<CounterProvider>();
+'''),
+            ),
+      ),
+    ),
+  },
+  // Final Project: Todo App
+  {
+    'title': 'Final Project: Todo App',
+    'subtitle': 'Putting It All Together',
+    'widget': Builder(
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Text(
+                      'Let\'s build a complete Todo app:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  BulletPoint('Add new tasks'),
+                  BulletPoint('Mark tasks as completed'),
+                  BulletPoint('Delete tasks'),
+                  BulletPoint('Persist data between sessions'),
+                ],
+              ),
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+// Todo App with Provider
+class Todo {
+  String title;
+  bool isDone;
+  Todo({required this.title, this.isDone = false});
+}
+
+class TodoProvider extends ChangeNotifier {
+  List<Todo> _todos = [];
+
+  List<Todo> get todos => _todos;
+
+  void addTodo(String title) {
+    _todos.add(Todo(title: title));
+    notifyListeners();
+  }
+
+  void toggleTodo(int index) {
+    _todos[index].isDone = !_todos[index].isDone;
+    notifyListeners();
+  }
+
+  void deleteTodo(int index) {
+    _todos.removeAt(index);
+    notifyListeners();
+  }
+}
+
+class TodoScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Todo App')),
+      body: Consumer<TodoProvider>(
+        builder: (context, todoProvider, child) {
+          return ListView.builder(
+            itemCount: todoProvider.todos.length,
+            itemBuilder: (context, index) {
+              final todo = todoProvider.todos[index];
+              return ListTile(
+                leading: Checkbox(
+                  value: todo.isDone,
+                  onChanged: (_) => todoProvider.toggleTodo(index),
+                ),
+                title: Text(
+                  todo.title,
+                  style: TextStyle(
+                    decoration: todo.isDone 
+                      ? TextDecoration.lineThrough 
+                      : null,
+                  ),
+                ),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () => todoProvider.deleteTodo(index),
+                ),
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => AddTodoDialog(),
+          );
+        },
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+'''),
+            ),
+          ),
+    ),
+  },
+  {
+    'title': 'Todo App: Add Todo Dialog',
+    'subtitle': 'Creating New Tasks',
+    'widget': Builder(
+      builder:
+          (context) => TwoColumnLayout(
+            left: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Text(
+                      'Dialog for adding new tasks:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            right: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedCodeBlock('''
+class AddTodoDialog extends StatelessWidget {
+  final _controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Add Todo'),
+      content: TextField(
+        controller: _controller,
+        decoration: InputDecoration(
+          hintText: 'Enter task',
+          border: OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_controller.text.isNotEmpty) {
+              context.read<TodoProvider>().addTodo(_controller.text);
+              Navigator.pop(context);
+            }
+          },
+          child: Text('Add'),
+        ),
+      ],
+    );
+  }
+}
+'''),
+            ),
+          ),
+    ),
+  },
+  {
+    'title': 'Module 7-8: Quiz',
+    'subtitle': 'Test Your Knowledge!',
+    'widget': const QuizSlide(
+      questions: [
+        {
+          'question':
+              'What is the difference between push and pop in navigation?',
+          'hint': 'Think about adding and removing screens.',
+          'answer':
+              'Push adds a new screen to the stack, while pop removes the current screen from the stack.',
+        },
+        {
+          'question': 'When would you use Provider instead of setState?',
+          'hint': 'Think about sharing data between widgets.',
+          'answer':
+              'Use Provider when you need to share state between multiple widgets or across different screens.',
+        },
+        {
+          'question': 'What is the main advantage of named routes?',
+          'hint': 'Think about organization and maintenance.',
+          'answer':
+              'Named routes make navigation more organized and maintainable by centralizing route definitions.',
+        },
+      ],
     ),
   },
 ];
